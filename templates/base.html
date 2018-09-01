@@ -73,13 +73,33 @@
               <li class="header">此功能暂缺</li>
             </ul>
           </li>
-          <!-- 用户信息: style can be found in dropdown.less -->
+          <!-- 用户信息: style can be found in dropdown.less
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <img src="{% static 'dist/img/user2-160x160.jpg' %}" class="user-image" alt="User Image">
               <span class="hidden-xs">管理员</span>
             </a>
-          </li>
+          </li>-->
+            <ul class="nav navbar-nav navbar-right">
+                {% if login_user %}
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">{% if login_user.photo %}
+                            <img src="/static/upload/{{ login_user.photo }}" width="50" height="50" class="img-circle">
+                        {% endif %}{{ login_user.nickname }} <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">个人中心</a></li>
+                            <li><a href="#">我的作品</a></li>
+                            <li><a href="#">帮助</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="/user/logout/">退出登录</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li><a href="/user/login/">登录</a></li>
+                    <li><a href="/user/regist/">注册</a></li>
+                {% endif %}
+            </ul>
           <!-- Control Sidebar Toggle Button -->
         </ul>
       </div>

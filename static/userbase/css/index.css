@@ -1,0 +1,30 @@
+.float-left ul,li{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.float-left li {
+    float: left;
+    padding: 2px;
+}
+
+#category ul{
+    background-color: #f9f9f9;
+}
+
+#art li{
+    margin: 5px;
+}
+
+#art dd {
+    padding: 2px 0;
+}
+
+/* 清除浮动 */
+#art ul:after{
+    display: block;
+    content: '';
+    height: 0;
+    overflow: hidden;
+    clear: both;
+}

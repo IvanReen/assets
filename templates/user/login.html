@@ -1,0 +1,64 @@
+{% extends 'userbase.html' %}
+{% block css %}
+    <link rel="stylesheet" href="/static/user/css/regist.css"></link>
+{% endblock %}
+{% block content %}
+    <div class="text-center">
+        <h4>登录页面</h4>
+        <form class="form form-horizontal"
+              action="/user/login/"
+              method="post"
+              enctype="multipart/form-data"
+        >
+
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="col-xs-3 text-right alignLine">账号</label>
+                <div class="col-xs-6">
+                    <input class="form-control" name="username" value="{{ form.username.value }}">
+                </div>
+                <div class="col-xs-3 text-left">
+                    {% if errors.username %}
+                        <span style="color: red;">
+                        {{ errors.username.0.message }}
+                    {% else %}<span>* 至少6个字符{% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-3 text-right alignLine">口令</label>
+                <div class="col-xs-6">
+                    <input type="password" class="form-control" name="password" >
+                </div>
+                <div class="col-xs-3 text-left">
+                    {% if errors.password %}
+                        <span style="color: red;">
+                        {{ errors.password.0.message }}
+                    {% else %}<span>* 至少8个字符{% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button class="btn btn-primary">登录</button>
+                <a class="btn btn-link" href="/user/regist/">未有账号, 注册</a>
+            </div>
+            <div class="form-group">
+                {% if errors %}
+<ul style="color: red">
+{% for error in errors.values %}
+<li>{{ error }}</li>
+{% endfor %}
+
+</ul>
+                {% endif %}
+            </div>
+
+        </form>
+
+        <input type="file" id="sFile"
+               style="display: none;"
+               onchange="uploadFile(this.files[0])">
+    </div>
+{% endblock %}

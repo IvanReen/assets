@@ -1,0 +1,127 @@
+{% extends 'userbase.html' %}
+{% block css %}
+    <link rel="stylesheet" href="/static/user/css/regist.css"></link>
+{% endblock %}
+{% block content %}
+    <div class="text-center">
+        <h4>注册页面</h4>
+        <form class="form form-horizontal"
+              action="/user/regist/"
+              method="post"
+              enctype="multipart/form-data"
+        >
+
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="col-xs-3 text-right alignLine">账号</label>
+                <div class="col-xs-6">
+                    <input class="form-control" name="username" value="{{ form.username.value }}">
+                </div>
+                <div class="col-xs-3 text-left">
+                    {% if errors.username %}
+                        <span style="color: red;">
+                        {{ errors.username.0.message }}
+                    {% else %}<span>* 至少6个字符{% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-3 text-right alignLine">口令</label>
+                <div class="col-xs-6">
+                    <input type="password" class="form-control" name="password" >
+                </div>
+                <div class="col-xs-3 text-left">
+                    {% if errors.password %}
+                        <span style="color: red;">
+                        {{ errors.password.0.message }}
+                    {% else %}<span>* 至少8个字符{% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-3 text-right alignLine">重复口令</label>
+                <div class="col-xs-6">
+                    <input type="password" class="form-control" name="password2">
+                </div>
+                <div class="col-xs-3 text-left">
+                    {% if errors.password2 %}
+                        <span style="color: red;">
+                        {{ errors.password2.0.message }}
+                    {% else %}<span>* 请重复口令</span>{% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-3 text-right alignLine">用户名</label>
+                <div class="col-xs-6">
+                    <input class="form-control" name="nickname" {% if form.nickname.value %} value="{{ form.nickname.value }}{% endif %}">
+                </div>
+                <div class="col-xs-3 text-left">
+                    {% if errors.nickname %}
+                        <span style="color: red;">
+                        {{ errors.nickname.0.message }}
+                    {% else %}<span>* 请输入用户名</span>{% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-3 text-right alignLine">邮箱</label>
+                <div class="col-xs-6">
+                    <input class="form-control" name="email" {% if form.email.value %} value="{{ form.email.value }}{% endif %}">
+                </div>
+                <div class="col-xs-3 text-left">
+                     {% if errors.email %}
+                        <span style="color: red;">
+                        {{ errors.email.0.message }}
+                     {% else %}<span>* 请输入一个有效的邮箱</span>{% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-3 text-right alignLine">头像</label>
+                <div class="col-xs-6 text-left">
+                    <input type="hidden" id="photo" name="photo">
+                    <img id="preImg"
+                         src="/static/userbase/images/default.jpg"
+                         width="100" height="100"
+                        onclick="sFile.click()">
+                </div>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-primary">注册</button>
+                <a class="btn btn-link" href="/user/login/">已有账号, 登录</a>
+            </div>
+        </form>
+
+        <input type="file" id="sFile"
+               style="display: none;"
+               onchange="uploadFile(this.files[0])">
+    </div>
+{% endblock %}
+{% block js %}
+    <script>
+        // ajax实现文件的上传
+        function uploadFile(file) {
+            var request = new XMLHttpRequest();
+            request.open('post', '/user/upload/', true);
+            request.onload = function (ev) {
+                if(request.status == 200 &&
+                        request.readyState==4){
+                     // 上传成功后，显示图片
+                    console.log('---->上传成功<----')
+                    data = JSON.parse(request.responseText); // {"path": "user/xxx.jpg","code":200,"msg":""}
+                     console.log(data)
+                    // 设置 id为preImg的<img>标签的src属性
+                    $('#preImg').attr('src', '/static/upload/'+data.path);
+                    $('#photo').val(data.path);  //修改photo隐藏域的value值
+                }
+            };
+
+            //发送上传图片的数据
+            var formdata = new FormData();
+            formdata.append('photo', file);
+            request.send(formdata);
+        }
+    </script>
+{% endblock %}
