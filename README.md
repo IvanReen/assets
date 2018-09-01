@@ -38,37 +38,37 @@ django-admin startproject django_project_name
 
 将app注册到项目中：
 
-INSTALLED_APPS = [
+	INSTALLED_APPS = [
 
-	...
+		...
 
-	'app_name',
+		'app_name',
 
-]
+	]
 
 2、配置数据库
 
-DATABASES = {
+	DATABASES = {
 
-	'default': {
+		'default': {
 
-		'ENGINE': 'django.db.backends.mysql',
+			'ENGINE': 'django.db.backends.mysql',
 
-		'NAME': 'mysql_name',
+			'NAME': 'mysql_name',
 
-		'HOST': '127.0.0.1',
+			'HOST': '127.0.0.1',
 
-		'PORT': 3306,
+			'PORT': 3306,
 
-		'USER': 'root',
+			'USER': 'root',
 
-		'PASSWORD': 'mysql',
+			'PASSWORD': 'mysql',
 
-		'CHARSET': 'utf8',
+			'CHARSET': 'utf8',
+
+		}
 
 	}
-
-}
 
 3、settings中添加xadmin插件作为后台管理
 
@@ -76,21 +76,25 @@ xadmin
 
 # 引入自创建的Sources Roots目录
 
-sys.path.insert(0, os.path.join(BASE_DIR, 'extapps'))
+	sys.path.insert(0, os.path.join(BASE_DIR, 'extapps'))
 
-INSTALLED_APPS = [
+	INSTALLED_APPS = [
 
-	...
+		...
 
-	'xadmin',
+		'xadmin',
 
-]
+	]
 
 更改url中admin的引入：import xadmin as admin
 
-数据迁移：生成迁移表---python manage.py makemigrations
+数据迁移：生成迁移表
 
-迁移到数据库---python manage.py migrate
+	python manage.py makemigrations
+
+迁移到数据库
+
+	python manage.py migrate
 
 xadmin和django自带的用户管理系统使用方法相同，只是导包的路径不同
 
@@ -130,7 +134,9 @@ pywin32-220.win-amd64-py3.5(配合wmi模块，获取主机信息的模块).exe�
 
 7、前前端页面展示及视图
 
-前段页面展示使用AdminLTE，它托管在GitHub上，可以通过下面的地址下载：https://github.com/almasaeed2010/AdminLTE/releases，
+前段页面展示使用AdminLTE，它托管在GitHub上，可以通过下面的地址下载：
+
+	https://github.com/almasaeed2010/AdminLTE/releases，
 
 AdminLTE自带JQuery和Bootstrap3框架，无需另外下载。
 
@@ -142,11 +148,11 @@ AdminLTE自带大量插件，比如表格、Charts等等，可根据需要载入
 
 将AdminLTE源文件包里的bootstrap、dist和plugins三个文件夹，全部拷贝到 static目录中，在settings中添加配置:
 
-STATICFILES_DIRS = [
+	STATICFILES_DIRS = [
 
-	os.path.join(BASE_DIR, "static"),
+		os.path.join(BASE_DIR, "static"),
 
-]
+	]
 前端页面就是各种挖坑，填坑操作，详见templates文件夹
 
 8、注册登录
