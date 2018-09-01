@@ -20,6 +20,8 @@ from myexts import xadmin as admin
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^assets/', include('myapps.assetsapp.urls')),
+    url(r'^assets/', include('myapps.assetsapp.urls', namespace='assets')),
+    url(r'^user/', include('myapps.user.urls')),
+    url(r'', include('myapps.assetsapp.urls')),
 
 ]

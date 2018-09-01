@@ -2,7 +2,7 @@ from django.conf.urls import url
 from myapps.assetsapp import views
 
 
-app_name = 'assets'
+app_name = 'assetsapp'
 
 urlpatterns = [
     url(r'^report/', views.report, name='report'),

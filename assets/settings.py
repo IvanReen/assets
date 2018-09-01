@@ -44,7 +44,9 @@ INSTALLED_APPS = [
     'myapps.assetsapp', # 注册app
     'xadmin', # 注册后台管理系统
     'crispy_forms',
-    'DjangoUeditor'
+    'DjangoUeditor', # 后台管理富文本插件，目前用不到，预留
+    'user',
+
 ]
 SITE_ID = 1
 
@@ -129,5 +131,8 @@ USE_TZ = False
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, 'static')
 ]
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/upload')
+MEDIA_URL = '/static/upload/'
