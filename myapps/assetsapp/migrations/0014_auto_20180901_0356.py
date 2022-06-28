@@ -6,6 +6,8 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -16,14 +18,57 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='NIC',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(blank=True, max_length=64, null=True, verbose_name='网卡名称')),
-                ('model', models.CharField(max_length=128, verbose_name='网卡型号')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
+                (
+                    'name',
+                    models.CharField(
+                        blank=True,
+                        max_length=64,
+                        null=True,
+                        verbose_name='网卡名称',
+                    ),
+                ),
+                (
+                    'model',
+                    models.CharField(max_length=128, verbose_name='网卡型号'),
+                ),
                 ('mac', models.CharField(max_length=64, verbose_name='MAC地址')),
-                ('ip_address', models.GenericIPAddressField(blank=True, null=True, verbose_name='IP地址')),
-                ('net_mask', models.CharField(blank=True, max_length=64, null=True, verbose_name='掩码')),
-                ('bonding', models.CharField(blank=True, max_length=64, null=True, verbose_name='绑定地址')),
-                ('asset', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='assetsapp.Asset')),
+                (
+                    'ip_address',
+                    models.GenericIPAddressField(
+                        blank=True, null=True, verbose_name='IP地址'
+                    ),
+                ),
+                (
+                    'net_mask',
+                    models.CharField(
+                        blank=True, max_length=64, null=True, verbose_name='掩码'
+                    ),
+                ),
+                (
+                    'bonding',
+                    models.CharField(
+                        blank=True,
+                        max_length=64,
+                        null=True,
+                        verbose_name='绑定地址',
+                    ),
+                ),
+                (
+                    'asset',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to='assetsapp.Asset',
+                    ),
+                ),
             ],
             options={
                 'verbose_name': '网卡',
@@ -32,7 +77,6 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.AlterUniqueTogether(
-            name='nic',
-            unique_together=set([('asset', 'model', 'mac')]),
+            name='nic', unique_together={('asset', 'model', 'mac')}
         ),
     ]

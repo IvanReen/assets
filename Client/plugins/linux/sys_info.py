@@ -15,23 +15,21 @@ def collect():
             result = res.stdout.read().decode()
             data_list = result.split(':')
 
-            if len(data_list) > 1:
-                raw_data[key] = data_list[1].strip()
-            else:
-                raw_data[key] = -1
+            raw_data[key] = data_list[1].strip() if len(data_list) > 1 else -1
         except Exception as e:
             print(e)
             raw_data[key] = -2
 
-    data = dict()
-    data['asset_type'] = 'server'
-    data['manufacturer'] = raw_data['Manufacturer']
-    data['sn'] = raw_data['Serial Number']
-    data['model'] = raw_data['Product Name']
-    data['uuid'] = raw_data['UUID']
-    data['wake_up_type'] = raw_data['Wake-up Type']
+    data = {
+        'asset_type': 'server',
+        'manufacturer': raw_data['Manufacturer'],
+        'sn': raw_data['Serial Number'],
+        'model': raw_data['Product Name'],
+        'uuid': raw_data['UUID'],
+        'wake_up_type': raw_data['Wake-up Type'],
+    }
 
-    data.update(get_os_info())
+    data |= get_os_info()
     data.update(get_cpu_info())
     data.update(get_ram_info())
     data.update(get_nic_info())
@@ -52,12 +50,13 @@ def get_os_info():
                                stdout=subprocess.PIPE, shell=True)
 
     release = release.stdout.read().decode().split(":")
-    data_dic = {
-        "os_distribution": distributor[1].strip() if len(distributor) > 1 else "",
+    return {
+        "os_distribution": distributor[1].strip()
+        if len(distributor) > 1
+        else "",
         "os_release": release[1].strip() if len(release) > 1 else "",
         "os_type": "Linux",
     }
-    return data_dic
 
 
 def get_cpu_info():
@@ -88,11 +87,7 @@ def get_cpu_info():
 
     cpu_model = raw_data["cpu_model"].split(":")
 
-    if len(cpu_model) > 1:
-        data["cpu_model"] = cpu_model[1].strip()
-    else:
-        data["cpu_model"] = -1
-
+    data["cpu_model"] = cpu_model[1].strip() if len(cpu_model) > 1 else -1
     return data
 
 
@@ -139,9 +134,7 @@ def get_ram_info():
                 if key == 'Locator':
                     ram_item_to_dic['slot'] = v.strip()
 
-        if item_ram_size == 0:
-            pass
-        else:
+        if item_ram_size != 0:
             ram_list.append(ram_item_to_dic)
 
     raw_total_size = subprocess.Popen("cat /proc/meminfo|grep MemTotal ", stdout=subprocess.PIPE, shell=True)
@@ -163,7 +156,7 @@ def get_nic_info():
 
     raw_data = raw_data.stdout.read().decode().split("\n")
 
-    nic_dic = dict()
+    nic_dic = {}
     next_ip_line = False
     last_mac_addr = None
 
@@ -193,10 +186,10 @@ def get_nic_info():
                                      'ip_address': ip_addr,
                                      }
             else:
-                if '%s_bonding_addr' % (mac_addr,) not in nic_dic:
-                    random_mac_addr = '%s_bonding_addr' % (mac_addr,)
+                if f'{mac_addr}_bonding_addr' not in nic_dic:
+                    random_mac_addr = f'{mac_addr}_bonding_addr'
                 else:
-                    random_mac_addr = '%s_bonding_addr2' % (mac_addr,)
+                    random_mac_addr = f'{mac_addr}_bonding_addr2'
 
                 nic_dic[random_mac_addr] = {'name': nic_name,
                                             'mac': random_mac_addr,
@@ -210,10 +203,7 @@ def get_nic_info():
         if "HWaddr" in line:
             next_ip_line = True
             last_mac_addr = line
-    nic_list = []
-    for k, v in nic_dic.items():
-        nic_list.append(v)
-
+    nic_list = list(nic_dic.values())
     return {'nic': nic_list}
 
 
@@ -236,10 +226,7 @@ def get_disk_info():
     size = size_data.split(":")[1].strip().split(" ")[0]
 
     result = {'physical_disk_driver': []}
-    disk_dict = dict()
-    disk_dict["model"] = model
-    disk_dict["size"] = size
-    disk_dict["sn"] = sn
+    disk_dict = {"model": model, "size": size, "sn": sn}
     result['physical_disk_driver'].append(disk_dict)
 
     return result

@@ -22,8 +22,9 @@ def update_test(data):
     # 将数据打包到一个字典内，并转换为json格式
     data = {"asset_data": json.dumps(data)}
     # 根据settings中的配置，构造url
-    url = "http://%s:%s%s" % (settings.Params['server'], settings.Params['port'], settings.Params['url'])
-    print('正在将数据发送至： [%s]  ......' % url)
+    url = f"http://{settings.Params['server']}:{settings.Params['port']}{settings.Params['url']}"
+
+    print(f'正在将数据发送至： [{url}]  ......')
     try:
         # 使用Python内置的urllib.request库，发送post请求。
         # 需要先将数据进行封装，并转换成bytes类型
@@ -31,7 +32,7 @@ def update_test(data):
         response = urllib.request.urlopen(url=url, data=data_encode, timeout=settings.Params['request_timeout'])
         print("\033[31;1m发送完毕！\033[0m ")
         message = response.read().decode()
-        print("返回结果：%s" % message)
+        print(f"返回结果：{message}")
     except Exception as e:
         message = "发送失败"
         print("\033[31;1m发送失败，%s\033[0m" % e)

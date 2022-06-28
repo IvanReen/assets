@@ -23,10 +23,9 @@ class InfoCollection(object):
         try:
             func = getattr(self, platform.system())
             info_data = func()
-            formatted_data = self.build_report_data(info_data)
-            return formatted_data
+            return self.build_report_data(info_data)
         except AttributeError:
-            sys.exit("不支持当前操作系统： [%s]! " % platform.system())
+            sys.exit(f"不支持当前操作系统： [{platform.system()}]! ")
 
     def Linux(self):
 

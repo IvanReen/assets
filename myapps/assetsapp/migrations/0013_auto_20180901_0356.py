@@ -6,6 +6,8 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -16,14 +18,71 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Disk',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
                 ('sn', models.CharField(max_length=128, verbose_name='硬盘SN号')),
-                ('slot', models.CharField(blank=True, max_length=64, null=True, verbose_name='所在插槽位')),
-                ('model', models.CharField(blank=True, max_length=128, null=True, verbose_name='磁盘型号')),
-                ('manufacturer', models.CharField(blank=True, max_length=128, null=True, verbose_name='磁盘制造商')),
-                ('capacity', models.FloatField(blank=True, null=True, verbose_name='磁盘容量(GB)')),
-                ('interface_type', models.CharField(choices=[('SATA', 'SATA'), ('SAS', 'SAS'), ('SCSI', 'SCSI'), ('SSD', 'SSD'), ('unknown', 'unknown')], default='unknown', max_length=16, verbose_name='接口类型')),
-                ('asset', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='assetsapp.Asset')),
+                (
+                    'slot',
+                    models.CharField(
+                        blank=True,
+                        max_length=64,
+                        null=True,
+                        verbose_name='所在插槽位',
+                    ),
+                ),
+                (
+                    'model',
+                    models.CharField(
+                        blank=True,
+                        max_length=128,
+                        null=True,
+                        verbose_name='磁盘型号',
+                    ),
+                ),
+                (
+                    'manufacturer',
+                    models.CharField(
+                        blank=True,
+                        max_length=128,
+                        null=True,
+                        verbose_name='磁盘制造商',
+                    ),
+                ),
+                (
+                    'capacity',
+                    models.FloatField(
+                        blank=True, null=True, verbose_name='磁盘容量(GB)'
+                    ),
+                ),
+                (
+                    'interface_type',
+                    models.CharField(
+                        choices=[
+                            ('SATA', 'SATA'),
+                            ('SAS', 'SAS'),
+                            ('SCSI', 'SCSI'),
+                            ('SSD', 'SSD'),
+                            ('unknown', 'unknown'),
+                        ],
+                        default='unknown',
+                        max_length=16,
+                        verbose_name='接口类型',
+                    ),
+                ),
+                (
+                    'asset',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to='assetsapp.Asset',
+                    ),
+                ),
             ],
             options={
                 'verbose_name': '硬盘',
@@ -32,7 +91,6 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.AlterUniqueTogether(
-            name='disk',
-            unique_together=set([('asset', 'sn')]),
+            name='disk', unique_together={('asset', 'sn')}
         ),
     ]

@@ -48,7 +48,7 @@ class NewAssetAdmin():
             if ret:
                 success_upline_number += 1
         # 顶部绿色提示信息
-        self.message_user(request, "成功批准  %s  条新资产上线！" % success_upline_number)
+        self.message_user(request, f"成功批准  {success_upline_number}  条新资产上线！")
     approve_selected_new_assets.short_description = "批准选择的新资产"
 
 class AssetAdmin():

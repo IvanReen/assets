@@ -44,12 +44,11 @@ def upload(request):
 
         # 生成新的文件名
         fileName = str(uuid.uuid4()).replace('-', '')+os.path.splitext(photo.name)[-1]
-        filePath = os.path.join(settings.MEDIA_ROOT, 'user/'+fileName)
+        filePath = os.path.join(settings.MEDIA_ROOT, f'user/{fileName}')
         with open(filePath, 'wb') as f:
             for chunk in photo.chunks():
                 f.write(chunk)
-        return JsonResponse({'code': 200,
-                             'path': 'user/'+fileName})
+        return JsonResponse({'code': 200, 'path': f'user/{fileName}'})
 
     return JsonResponse({'code': 101,
                          'msg': '图片上传仅支持POST请求'})
@@ -70,7 +69,7 @@ def login(request):
         if not errors:
             user_qs = UserProfile.objects.filter(username=username)
             if not user_qs.exists():
-                errors['username'] = '%s 用户不存在' % username
+                errors['username'] = f'{username} 用户不存在'
             else:
                 user = user_qs.first() # 从查询结果中获取第一条数据
                 if check_password(password, user.password):

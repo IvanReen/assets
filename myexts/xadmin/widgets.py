@@ -26,7 +26,7 @@ class AdminDateWidget(forms.DateInput):
     def __init__(self, attrs=None, format=None):
         final_attrs = {'class': 'date-field', 'size': '10'}
         if attrs is not None:
-            final_attrs.update(attrs)
+            final_attrs |= attrs
         super(AdminDateWidget, self).__init__(attrs=final_attrs, format=format)
 
     def render(self, name, value, attrs=None):
@@ -44,7 +44,7 @@ class AdminTimeWidget(forms.TimeInput):
     def __init__(self, attrs=None, format=None):
         final_attrs = {'class': 'time-field', 'size': '8'}
         if attrs is not None:
-            final_attrs.update(attrs)
+            final_attrs |= attrs
         super(AdminTimeWidget, self).__init__(attrs=final_attrs, format=format)
 
     def render(self, name, value, attrs=None):
@@ -72,15 +72,14 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
         forms.MultiWidget.__init__(self, widgets, attrs)
 
     def render(self, name, value, attrs=None):
-        if DJANGO_11:
-            input_html = [ht for ht in super(AdminSplitDateTime, self).render(name, value, attrs).split('\n') if ht != '']
-            # return input_html
-            return mark_safe('<div class="datetime clearfix"><div class="input-group date bootstrap-datepicker"><span class="input-group-addon"><i class="fa fa-calendar"></i></span>%s'
-                             '<span class="input-group-btn"><button class="btn btn-default" type="button">%s</button></span></div>'
-                             '<div class="input-group time bootstrap-clockpicker"><span class="input-group-addon"><i class="fa fa-clock-o">'
-                             '</i></span>%s<span class="input-group-btn"><button class="btn btn-default" type="button">%s</button></span></div></div>' % (input_html[0], _(u'Today'), input_html[1], _(u'Now')))
-        else:
+        if not DJANGO_11:
             return super(AdminSplitDateTime, self).render(name, value, attrs)
+        input_html = [ht for ht in super(AdminSplitDateTime, self).render(name, value, attrs).split('\n') if ht != '']
+        # return input_html
+        return mark_safe('<div class="datetime clearfix"><div class="input-group date bootstrap-datepicker"><span class="input-group-addon"><i class="fa fa-calendar"></i></span>%s'
+                         '<span class="input-group-btn"><button class="btn btn-default" type="button">%s</button></span></div>'
+                         '<div class="input-group time bootstrap-clockpicker"><span class="input-group-addon"><i class="fa fa-clock-o">'
+                         '</i></span>%s<span class="input-group-btn"><button class="btn btn-default" type="button">%s</button></span></div></div>' % (input_html[0], _(u'Today'), input_html[1], _(u'Now')))
 
     def format_output(self, rendered_widgets):
         return mark_safe(u'<div class="datetime clearfix">%s%s</div>' %
@@ -135,12 +134,12 @@ class AdminCheckboxSelect(forms.CheckboxSelectMultiple):
             final_attrs = self.build_attrs(attrs, name=name)
         output = []
         # Normalize to strings
-        str_values = set([force_text(v) for v in value])
+        str_values = {force_text(v) for v in value}
         for i, (option_value, option_label) in enumerate(chain(self.choices, choices)):
             # If an ID attribute was given, add a numeric index as a suffix,
             # so that the checkboxes don't all have the same ID attribute.
             if has_id:
-                final_attrs = dict(final_attrs, id='%s_%s' % (attrs['id'], i))
+                final_attrs = dict(final_attrs, id=f"{attrs['id']}_{i}")
                 label_for = u' for="%s"' % final_attrs['id']
             else:
                 label_for = ''
@@ -163,7 +162,7 @@ class AdminSelectMultiple(forms.SelectMultiple):
     def __init__(self, attrs=None):
         final_attrs = {'class': 'select-multi'}
         if attrs is not None:
-            final_attrs.update(attrs)
+            final_attrs |= attrs
         super(AdminSelectMultiple, self).__init__(attrs=final_attrs)
 
 
@@ -179,7 +178,7 @@ class AdminTextareaWidget(forms.Textarea):
     def __init__(self, attrs=None):
         final_attrs = {'class': 'textarea-field'}
         if attrs is not None:
-            final_attrs.update(attrs)
+            final_attrs |= attrs
         super(AdminTextareaWidget, self).__init__(attrs=final_attrs)
 
 
@@ -188,7 +187,7 @@ class AdminTextInputWidget(forms.TextInput):
     def __init__(self, attrs=None):
         final_attrs = {'class': 'text-field'}
         if attrs is not None:
-            final_attrs.update(attrs)
+            final_attrs |= attrs
         super(AdminTextInputWidget, self).__init__(attrs=final_attrs)
 
 
@@ -197,7 +196,7 @@ class AdminURLFieldWidget(forms.TextInput):
     def __init__(self, attrs=None):
         final_attrs = {'class': 'url-field'}
         if attrs is not None:
-            final_attrs.update(attrs)
+            final_attrs |= attrs
         super(AdminURLFieldWidget, self).__init__(attrs=final_attrs)
 
 
@@ -206,7 +205,7 @@ class AdminIntegerFieldWidget(forms.TextInput):
     def __init__(self, attrs=None):
         final_attrs = {'class': 'int-field'}
         if attrs is not None:
-            final_attrs.update(attrs)
+            final_attrs |= attrs
         super(AdminIntegerFieldWidget, self).__init__(attrs=final_attrs)
 
 
@@ -215,6 +214,6 @@ class AdminCommaSeparatedIntegerFieldWidget(forms.TextInput):
     def __init__(self, attrs=None):
         final_attrs = {'class': 'sep-int-field'}
         if attrs is not None:
-            final_attrs.update(attrs)
+            final_attrs |= attrs
         super(AdminCommaSeparatedIntegerFieldWidget,
               self).__init__(attrs=final_attrs)

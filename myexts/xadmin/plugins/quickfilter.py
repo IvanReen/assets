@@ -86,20 +86,20 @@ class QuickFilterPlugin(BaseAdminPlugin):
             if p_val == "False":
                 lookup_params[p_key] = False
         use_distinct = False
-        
+
         if not hasattr(self.admin_view,'quickfilter'):
             self.admin_view.quickfilter = {}
- 
+
         # for clean filters
         self.admin_view.quickfilter['has_query_param'] = bool(lookup_params)
         self.admin_view.quickfilter['clean_query_url'] = self.admin_view.get_query_string(remove=[k for k in self.request.GET.keys() if k.startswith(FILTER_PREFIX)])
- 
+
         # Normalize the types of keys
         if not self.free_query_filter:
             for key, value in lookup_params.items():
                 if not self.lookup_allowed(key, value):
-                    raise SuspiciousOperation("Filtering by %s not allowed" % key)
- 
+                    raise SuspiciousOperation(f"Filtering by {key} not allowed")
+
         self.filter_specs = []
         if self.list_quick_filter:
             for list_quick_filter in self.list_quick_filter:
@@ -107,9 +107,9 @@ class QuickFilterPlugin(BaseAdminPlugin):
                 field_order_by = None
                 field_limit = None
                 field_parts = []
-                sort_key = None 
+                sort_key = None
                 cache_config = None
-                
+
                 if type(list_quick_filter)==dict and 'field' in list_quick_filter:
                     field = list_quick_filter['field']
                     if 'order_by' in list_quick_filter:
@@ -118,21 +118,21 @@ class QuickFilterPlugin(BaseAdminPlugin):
                         field_limit = list_quick_filter['limit']
                     if 'sort' in list_quick_filter and callable(list_quick_filter['sort']):
                         sort_key = list_quick_filter['sort']
-                    if 'cache' in list_quick_filter and type(list_quick_filter)==dict:
+                    if 'cache' in list_quick_filter:
                         cache_config = list_quick_filter['cache']
-                        
+
                 else:        
                     field = list_quick_filter # This plugin only uses MultiselectFieldListFilter
-                
+
                 if not isinstance(field, models.Field):
                     field_path = field
                     field_parts = get_fields_from_path(self.model, field_path)
                     field = field_parts[-1]
                 spec = QuickFilterMultiSelectFieldListFilter(field, self.request, lookup_params,self.model, self.admin_view, field_path=field_path,field_order_by=field_order_by,field_limit=field_limit,sort_key=sort_key,cache_config=cache_config)
-                 
+
                 if len(field_parts)>1:
-                    spec.title = "%s %s"%(field_parts[-2].name,spec.title) 
-                 
+                    spec.title = f"{field_parts[-2].name} {spec.title}" 
+
                 # Check if we need to use distinct()
                 use_distinct = True#(use_distinct orlookup_needs_distinct(self.opts, field_path))
                 if spec and spec.has_output():
@@ -143,20 +143,17 @@ class QuickFilterPlugin(BaseAdminPlugin):
                         self.admin_view.message_user(_("<b>Filtering error:</b> %s") % e.messages[0], 'error')
                     if new_qs is not None:
                         queryset = new_qs
- 
+
                     self.filter_specs.append(spec)
- 
+
         self.has_filters = bool(self.filter_specs)
         self.admin_view.quickfilter['filter_specs'] = self.filter_specs
         obj = filter(lambda f: f.is_used, self.filter_specs)
         if six.PY3:
             obj = list(obj)
         self.admin_view.quickfilter['used_filter_num'] = len(obj)
- 
-        if use_distinct:
-            return queryset.distinct()
-        else:
-            return queryset
+
+        return queryset.distinct() if use_distinct else queryset
     
     def block_left_navbar(self, context, nodes):
         nodes.append(loader.render_to_string('xadmin/blocks/modal_list.left_navbar.quickfilter.html',

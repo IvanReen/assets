@@ -9,21 +9,21 @@ def log(log_type, msg=None, asset=None, new_asset=None, request=None):
     """
     event = models.EventLog()
     if log_type == "upline":
-        event.name = "%s <%s> ：  上线" % (asset.name, asset.sn)
+        event.name = f"{asset.name} <{asset.sn}> ：  上线"
         event.asset = asset
         event.detail = "资产成功上线！"
         event.user = request.user
     elif log_type == "approve_failed":
-        event.name = "%s <%s> ：  审批失败" % (new_asset.asset_type, new_asset.sn)
+        event.name = f"{new_asset.asset_type} <{new_asset.sn}> ：  审批失败"
         event.new_asset = new_asset
         event.detail = "审批失败！\n%s" % msg
         event.user = request.user
     elif log_type == "update":
-        event.name = "%s <%s> ：  数据更新！" % (asset.asset_type, asset.sn)
+        event.name = f"{asset.asset_type} <{asset.sn}> ：  数据更新！"
         event.asset = asset
         event.detail = "更新成功！"
     elif log_type == "update_failed":
-        event.name = "%s <%s> ：  更新失败" % (asset.asset_type, asset.sn)
+        event.name = f"{asset.asset_type} <{asset.sn}> ：  更新失败"
         event.asset = asset
         event.detail = "更新失败！\n%s" % msg
     # 更多日志类型.....
@@ -66,7 +66,7 @@ class ApproveAsset:
 
     def asset_upline(self):
         # 为以后的其它类型资产扩展留下接口
-        func = getattr(self, "_%s_upline" % self.new_asset.asset_type)
+        func = getattr(self, f"_{self.new_asset.asset_type}_upline")
         ret = func()
         return ret and True
 
@@ -97,13 +97,12 @@ class ApproveAsset:
         创建资产并上线
         :return:
         """
-        # 利用request.user自动获取当前管理人员的信息，作为审批人添加到资产数据中。
-        asset = models.Asset.objects.create(asset_type=self.new_asset.asset_type,
-                                            name="%s: %s" % (self.new_asset.asset_type, self.new_asset.sn),
-                                            sn=self.new_asset.sn,
-                                            approved_by=self.request.user,
-                                            )
-        return asset
+        return models.Asset.objects.create(
+            asset_type=self.new_asset.asset_type,
+            name=f"{self.new_asset.asset_type}: {self.new_asset.sn}",
+            sn=self.new_asset.sn,
+            approved_by=self.request.user,
+        )
 
     def _create_manufacturer(self, asset):
         """
@@ -111,9 +110,7 @@ class ApproveAsset:
         :param asset:
         :return:
         """
-        # 判断厂商数据是否存在。如果存在，看看数据库里是否已经有该厂商，再决定是获取还是创建。
-        m = self.new_asset.manufacturer
-        if m:
+        if m := self.new_asset.manufacturer:
             manufacturer_obj, _ = models.Manufacturer.objects.get_or_create(name=m)
             asset.manufacturer = manufacturer_obj
             asset.save()
@@ -215,9 +212,8 @@ class ApproveAsset:
             nic.model = nic_dict.get('model')
             nic.mac = nic_dict.get('mac')
             nic.ip_address = nic_dict.get('ip_address')
-            if nic_dict.get('net_mask'):
-                if len(nic_dict.get('net_mask')) > 0:
-                    nic.net_mask = nic_dict.get('net_mask')[0]
+            if nic_dict.get('net_mask') and len(nic_dict.get('net_mask')) > 0:
+                nic.net_mask = nic_dict.get('net_mask')[0]
             nic.save()
 
     def _delete_original_asset(self):
@@ -244,7 +240,7 @@ class UpdateAsset:
 
     def asset_update(self):
         # 为以后的其它类型资产扩展留下接口
-        func = getattr(self, "_%s_update" % self.report_data['asset_type'])
+        func = getattr(self, f"_{self.report_data['asset_type']}_update")
         func()
 
     def _server_update(self):
@@ -268,8 +264,7 @@ class UpdateAsset:
         """
         更新厂商
         """
-        m = self.report_data.get('manufacturer')
-        if m:
+        if m := self.report_data.get('manufacturer'):
             manufacturer_obj, _ = models.Manufacturer.objects.get_or_create(name=m)
             self.asset.manufacturer = manufacturer_obj
         else:
@@ -309,20 +304,18 @@ class UpdateAsset:
         """
         # 获取已有内存信息，并转成字典格式
         old_rams = models.RAM.objects.filter(asset=self.asset)
-        old_rams_dict = dict()
+        old_rams_dict = {}
         if old_rams:
             for ram in old_rams:
                 old_rams_dict[ram.slot] = ram
-        # 获取新数据中的内存信息，并转成字典格式
-        new_rams_list = self.report_data['ram']
-        new_rams_dict = dict()
-        if new_rams_list:
+        new_rams_dict = {}
+        if new_rams_list := self.report_data['ram']:
             for item in new_rams_list:
                 new_rams_dict[item['slot']] = item
 
-        # 利用set类型的差集功能，获得需要删除的内存数据对象
-        need_deleted_keys = set(old_rams_dict.keys()) - set(new_rams_dict.keys())
-        if need_deleted_keys:
+        if need_deleted_keys := set(old_rams_dict.keys()) - set(
+            new_rams_dict.keys()
+        ):
             for key in need_deleted_keys:
                 old_rams_dict[key].delete()
 
@@ -342,20 +335,19 @@ class UpdateAsset:
         更新硬盘信息。类似更新内存。
         """
         old_disks = models.Disk.objects.filter(asset=self.asset)
-        old_disks_dict = dict()
+        old_disks_dict = {}
         if old_disks:
             for disk in old_disks:
                 old_disks_dict[disk.sn] = disk
 
-        new_disks_list = self.report_data['physical_disk_driver']
-        new_disks_dict = dict()
-        if new_disks_list:
+        new_disks_dict = {}
+        if new_disks_list := self.report_data['physical_disk_driver']:
             for item in new_disks_list:
                 new_disks_dict[item['sn']] = item
 
-        # 需要删除的
-        need_deleted_keys = set(old_disks_dict.keys()) - set(new_disks_dict.keys())
-        if need_deleted_keys:
+        if need_deleted_keys := set(old_disks_dict.keys()) - set(
+            new_disks_dict.keys()
+        ):
             for key in need_deleted_keys:
                 old_disks_dict[key].delete()
 
@@ -379,36 +371,43 @@ class UpdateAsset:
         更新网卡信息。类似更新内存。
         """
         old_nics = models.NIC.objects.filter(asset=self.asset)
-        old_nics_dict = dict()
+        old_nics_dict = {}
         if old_nics:
             for nic in old_nics:
                 old_nics_dict[nic.model+nic.mac] = nic
 
-        new_nics_list = self.report_data['nic']
-        new_nics_dict = dict()
-        if new_nics_list:
+        new_nics_dict = {}
+        if new_nics_list := self.report_data['nic']:
             for item in new_nics_list:
                 new_nics_dict[item['model']+item['mac']] = item
 
-        # 需要删除的
-        need_deleted_keys = set(old_nics_dict.keys()) - set(new_nics_dict.keys())
-        if need_deleted_keys:
+        if need_deleted_keys := set(old_nics_dict.keys()) - set(
+            new_nics_dict.keys()
+        ):
             for key in need_deleted_keys:
                 old_nics_dict[key].delete()
 
         # 需要新增或更新的
         if new_nics_dict:
-            for key in new_nics_dict:
-                if new_nics_dict[key].get('net_mask') and len(new_nics_dict[key].get('net_mask')) > 0:
-                    net_mask = new_nics_dict[key].get('net_mask')[0]
-                else:
-                    net_mask = ""
+            for key, value in new_nics_dict.items():
+                net_mask = (
+                    new_nics_dict[key].get('net_mask')[0]
+                    if new_nics_dict[key].get('net_mask')
+                    and len(new_nics_dict[key].get('net_mask')) > 0
+                    else ""
+                )
+
                 defaults = {
                     'name': new_nics_dict[key].get('name'),
                     'ip_address': new_nics_dict[key].get('ip_address'),
                     'net_mask': net_mask,
                 }
-                models.NIC.objects.update_or_create(asset=self.asset, model=new_nics_dict[key]['model'],
-                                                    mac=new_nics_dict[key]['mac'], defaults=defaults)
+                models.NIC.objects.update_or_create(
+                    asset=self.asset,
+                    model=value['model'],
+                    mac=new_nics_dict[key]['mac'],
+                    defaults=defaults,
+                )
+
 
         print('更新成功！')

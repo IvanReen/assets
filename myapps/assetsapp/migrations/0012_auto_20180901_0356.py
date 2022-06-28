@@ -6,6 +6,8 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -16,11 +18,43 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CPU',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('cpu_model', models.CharField(blank=True, max_length=128, null=True, verbose_name='CPU型号')),
-                ('cpu_count', models.PositiveSmallIntegerField(default=1, verbose_name='物理CPU个数')),
-                ('cpu_core_count', models.PositiveSmallIntegerField(default=1, verbose_name='CPU核数')),
-                ('asset', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='assetsapp.Asset')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
+                (
+                    'cpu_model',
+                    models.CharField(
+                        blank=True,
+                        max_length=128,
+                        null=True,
+                        verbose_name='CPU型号',
+                    ),
+                ),
+                (
+                    'cpu_count',
+                    models.PositiveSmallIntegerField(
+                        default=1, verbose_name='物理CPU个数'
+                    ),
+                ),
+                (
+                    'cpu_core_count',
+                    models.PositiveSmallIntegerField(
+                        default=1, verbose_name='CPU核数'
+                    ),
+                ),
+                (
+                    'asset',
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to='assetsapp.Asset',
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'CPU',
@@ -31,13 +65,56 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='RAM',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('sn', models.CharField(blank=True, max_length=128, null=True, verbose_name='SN号')),
-                ('model', models.CharField(blank=True, max_length=128, null=True, verbose_name='内存型号')),
-                ('manufacturer', models.CharField(blank=True, max_length=128, null=True, verbose_name='内存制造商')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
+                (
+                    'sn',
+                    models.CharField(
+                        blank=True,
+                        max_length=128,
+                        null=True,
+                        verbose_name='SN号',
+                    ),
+                ),
+                (
+                    'model',
+                    models.CharField(
+                        blank=True,
+                        max_length=128,
+                        null=True,
+                        verbose_name='内存型号',
+                    ),
+                ),
+                (
+                    'manufacturer',
+                    models.CharField(
+                        blank=True,
+                        max_length=128,
+                        null=True,
+                        verbose_name='内存制造商',
+                    ),
+                ),
                 ('slot', models.CharField(max_length=64, verbose_name='插槽')),
-                ('capacity', models.IntegerField(blank=True, null=True, verbose_name='内存大小(GB)')),
-                ('asset', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='assetsapp.Asset')),
+                (
+                    'capacity',
+                    models.IntegerField(
+                        blank=True, null=True, verbose_name='内存大小(GB)'
+                    ),
+                ),
+                (
+                    'asset',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to='assetsapp.Asset',
+                    ),
+                ),
             ],
             options={
                 'verbose_name': '内存',
@@ -46,7 +123,6 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.AlterUniqueTogether(
-            name='ram',
-            unique_together=set([('asset', 'slot')]),
+            name='ram', unique_together={('asset', 'slot')}
         ),
     ]
